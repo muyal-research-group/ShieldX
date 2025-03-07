@@ -1,0 +1,25 @@
+[project]
+name = "shieldx"
+version = "0.0.1"
+description = ""
+authors = [
+    {name = "Ignacio Castillo",email = "ignacio.bcastillo@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10,<4"
+dependencies = [
+    "pydantic (>=2.10.6,<3.0.0)",
+    "fastapi (>=0.115.11,<0.116.0)",
+    "mictlanx (==0.0.161a3)",
+    "pika (>=1.3.2,<2.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[[tool.poetry.source]]
+name = "test"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"

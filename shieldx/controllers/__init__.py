@@ -1,0 +1,1 @@
+from shieldx.controllers.events import router as events_router

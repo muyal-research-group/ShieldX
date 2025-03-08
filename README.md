@@ -9,6 +9,28 @@
 </div>
 
 ShieldX is a secure management platform for microservices. It provides an integrated dashboard and toolset to manage, monitor, and secure your microservices environment. With robust encryption, secure communication channels, and scalable orchestration, ShieldX is designed to safeguard your infrastructure while ensuring efficient operations.
+## ⚠️ Clone the repo and setup a remoto 🍴: 
+
+1. You must clone the remote from the organization of Muyal: 
+```bash
+git clone git@github.com:muyal-research-group/ShieldX.git
+```
+
+2. You must create a fork (please check it up in the [Contribution](#contribution) section)
+
+3. Add a new remote in your local git: 
+   ```bash
+   git remote add <remote_name> <ssh> 
+   ```
+You must select ```<remote_name>``` and you must copy the ```<ssh>``` uri in the github page of your 
+
+<div align="center">
+<img width=350 src="images/gitclone_ssh.png"/>
+</div>
+
+4. Remember to push all your commits to your ```<remote_name>``` to avoid github conflicts. 
+
+Thats it!  let's get started 🚀
 
 ## Getting started
 
@@ -30,6 +52,50 @@ Once you get all the software, please execute the following command to install t
 ```bash
 poetry install
 ```
+### How to deploy database and broker
+
+**Install docker and docker Compose:**
+
+- Make sure Docker is installed on your system. See [Docker's installation guide](https://docs.docker.com/get-docker/) for instructions.
+- Docker Compose is usually included with Docker Desktop. Otherwise, follow [Docker Compose installation instructions](https://docs.docker.com/compose/install/).
+
+**Navigate to your project directory:**
+
+- Open a terminal and change to the directory where your `docker-compose.yml` file is located.
+
+**Start the services:**
+
+- Run the following command to start both services in detached mode:
+```bash
+docker compose up -d
+```
+
+**Stopping the services:**
+```bash
+docker compose down
+```
+
+# 🛠️ Execution Guide: FastAPI Server & RabbitMQ Consumer/Producer
+
+This guide explains how to **run a FastAPI server** and manage **RabbitMQ consumers and producers** for event models.
+1. Run the FastAPI Server
+```bash
+poetry run python3 ./shieldx/server.py
+```
+The server will be available at: http://localhost:20000, API docs can be accessed at: [http://localhost:20000/docs](http://localhost:20000/docs)
+
+2. Run the rabbitMQ Consumer:
+```bash
+poetry run python3 ./shieldx/consumer.py
+```
+This will connect to RabbitMQ and listen for incoming messages.
+3. Run the rabbitMQ Producer:
+```bash
+poetry run python3 ./shieldx/producer.py
+```
+
+
+
 
 ## Running Tests
 
@@ -50,7 +116,7 @@ All tests for this project are located in the `tests/` folder at the root of the
     pytest tests/test_policy_manager.py
     ```
 
-## Contributing
+## Contributing[](#contribution)
 
 Please follow these steps to help improve the project:
 

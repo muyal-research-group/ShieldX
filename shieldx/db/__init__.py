@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient,AsyncIOMotorCollection
 
 MONGODB_URI = os.environ.get("MONGODB_URI","mongodb://localhost:27017/shieldx")
 # client                   = MongoClient(MONGODB_URI)
-MONGO_DATABASE_NAME      = os.environ.get("MONGO_DATABASE_NAME","shieldx")
+MONGO_DATABASE_NAME = os.environ.get("MONGO_DATABASE_NAME","shieldx")
 # Initialize MongoClient
 client = None
 

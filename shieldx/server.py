@@ -27,10 +27,14 @@ async def lifespan(app: FastAPI):
     await close_mongo_connection()
 
 
-app = FastAPI(title="CryptoMesh API",lifespan=lifespan)
+app = FastAPI(title="ShieldX API",lifespan=lifespan, description="API para registrar y consultar eventos generados por microservicios.",
+    contact={
+        "name": "Equipo ShieldX",
+        "email": "soporte@shieldx.io",
+    })
 
 # Include API routes from the service controller under /api/v1
-app.include_router(events_router, prefix="/api/v1")
+app.include_router(events_router, prefix="/api/v1",tags=["Eventos"],)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=20000)

@@ -15,7 +15,11 @@ def get_events_service() -> EventsService:
     return EventsService(repository)
 
 # ✅ GET /events → Obtener todos los eventos con paginación
-@router.get("/events", response_model=List[EventModel])
+@router.get("/events", response_model=List[EventModel], summary="Listar eventos",
+    description=(
+        "Recupera una lista de eventos registrados en el sistema. "
+        "Se puede aplicar paginación y filtros opcionales por `service_id`, "
+        "`microservice_id` o `function_id`."))
 async def get_events(
     events_service: EventsService = Depends(get_events_service),
     service_id: Optional[str] = Query(None, description="Filtrar por service_id"),
@@ -31,22 +35,26 @@ async def get_events(
     return events
 
 # ✅ GET /events/service/{service_id} → Obtener eventos por service_id
-@router.get("/events/service/{service_id}", response_model=List[EventModel])
+@router.get("/events/service/{service_id}", response_model=List[EventModel], summary="Buscar eventos por service_id",
+    description="Recupera todos los eventos asociados al `service_id` especificado.")
 async def get_events_by_service(service_id: str, events_service: EventsService = Depends(get_events_service)):
     return await events_service.get_events_filtered(service_id=service_id)
 
 # ✅ GET /events/microservice/{microservice_id} → Obtener eventos por microservice_id
-@router.get("/events/microservice/{microservice_id}", response_model=List[EventModel])
+@router.get("/events/microservice/{microservice_id}", response_model=List[EventModel], summary="Buscar eventos por microservice_id",
+    description="Recupera todos los eventos asociados al `microservice_id` especificado."   )
 async def get_events_by_microservice(microservice_id: str, events_service: EventsService = Depends(get_events_service)):
     return await events_service.get_events_filtered(microservice_id=microservice_id)
 
 # ✅ GET /events/function/{function_id} → Obtener eventos por function_id
-@router.get("/events/function/{function_id}", response_model=List[EventModel])
+@router.get("/events/function/{function_id}", response_model=List[EventModel], summary="Buscar eventos por function_id",
+    description="Recupera todos los eventos asociados al `function_id` especificado.")
 async def get_events_by_function(function_id: str, events_service: EventsService = Depends(get_events_service)):
     return await events_service.get_events_filtered(function_id=function_id)
 
 # ✅ GET /events/{event_id} → Obtener un evento por ID
-@router.get("/events/{event_id}", response_model=EventModel)
+@router.get("/events/{event_id}", response_model=EventModel, summary="Obtener evento por ID",
+    description="Recupera los detalles de un evento específico utilizando su `event_id`.")
 async def get_event_by_id(event_id: str, events_service: EventsService = Depends(get_events_service)):
     event = await events_service.get_event_by_id(event_id)
     if not event:
@@ -54,7 +62,8 @@ async def get_event_by_id(event_id: str, events_service: EventsService = Depends
     return event
 
 # (Opcional) ✅ POST /events → Crear un nuevo evento
-@router.post("/events", response_model=dict)
+@router.post("/events", response_model=dict, summary="Crear un nuevo evento",
+    description="Registra un nuevo evento en la base de datos utilizando el esquema definido en el modelo `EventModel`.")
 async def create_event(event: EventModel, events_service: EventsService = Depends(get_events_service)):
     created_event = await events_service.create_event(event)
 
@@ -67,7 +76,8 @@ async def create_event(event: EventModel, events_service: EventsService = Depend
 
 
 # (Opcional) ✅ PUT /events/{event_id} → Actualizar un evento
-@router.put("/events/{event_id}", response_model=EventModel)
+@router.put("/events/{event_id}", response_model=EventModel, summary="Actualizar evento",
+    description="Actualiza los campos de un evento existente utilizando su `event_id`.")
 async def update_event(event_id: str, update_data: dict, events_service: EventsService = Depends(get_events_service)):
     updated_event = await events_service.update_event(event_id, update_data)
     if not updated_event:
@@ -75,7 +85,8 @@ async def update_event(event_id: str, update_data: dict, events_service: EventsS
     return updated_event
 
 # (Opcional) ✅ DELETE /events/{event_id} → Eliminar un evento
-@router.delete("/events/{event_id}")
+@router.delete("/events/{event_id}", summary="Eliminar evento",
+    description="Elimina un evento existente de la base de datos utilizando su `event_id`.")
 async def delete_event(event_id: str, events_service: EventsService = Depends(get_events_service)):
     success = await events_service.delete_event(event_id)
     if not success:

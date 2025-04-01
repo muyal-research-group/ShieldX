@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Any
-from datetime import datetime
+from datetime import datetime, timezone
 
 class EventModel(BaseModel):
     service_id: str
     microservice_id: str
     function_id: str
     event_type: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     payload: Optional[Any] = None
 
 class EncryptStart(EventModel):
@@ -15,8 +15,8 @@ class EncryptStart(EventModel):
     Evento específico para cuando se inicia el cifrado.
     """
     
-    source: str = Field(..., title="Source of Data")  # De dónde vienen los datos
-    sink: str = Field(..., title="Data Destination")  # Dónde se guardarán después de cifrarse
+    source: str  # De dónde vienen los datos
+    sink: str # Dónde se guardarán después de cifrarse
 
 
 class EncryptDone(EventModel):

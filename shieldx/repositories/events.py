@@ -103,4 +103,4 @@ class EventsRepository:
             return None
         except PyMongoError as e:
             print(f"❌ Error al actualizar el evento: {e}")
-            return None
+            return None 

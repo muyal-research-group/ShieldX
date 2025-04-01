@@ -17,7 +17,7 @@ class EventsService:
 
         return None
 
-
+    
     async def get_all_events(self) -> list[EventModel]:
         return await self.repository.find_all_events()
     

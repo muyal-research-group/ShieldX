@@ -23,4 +23,4 @@ async def connect_to_mongo():
 # Shutdown event to close the MongoClient when the application shuts down
 async def close_mongo_connection():
     global client
-    client.close()
+    client.close()  

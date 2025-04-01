@@ -11,4 +11,4 @@ async def create_indexes():
     await db["events"].create_index("service_id")
     await db["events"].create_index("microservice_id")
     await db["events"].create_index("function_id")
-    print("✅ Índices creados correctamente")
+    print("✅ Índices creados correctamente")   

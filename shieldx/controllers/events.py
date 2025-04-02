@@ -8,8 +8,8 @@ import os
 
 router = APIRouter()
 
-# Dependency: create a MongoDB client and initialize the repository and service.
 def get_events_service() -> EventsService:
+    """Dependency: create a MongoDB client and initialize the repository and service."""
     collection = get_collection("events")
     repository = EventsRepository(collection)
     return EventsService(repository)

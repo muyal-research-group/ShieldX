@@ -1,16 +1,17 @@
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
 from shieldx.server import app
 from shieldx.db import connect_to_mongo
 
 
-@pytest.fixture(autouse=True)
+@pytest_asyncio.fixture(autouse=True)
 async def setup_mongodb():
     await connect_to_mongo()
 
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client():
     transport = ASGITransport(app=app)  # Usa app FastAPI directamente
     async with AsyncClient(transport=transport, base_url="http://test") as ac:

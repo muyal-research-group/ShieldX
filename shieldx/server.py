@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from shieldx.controllers import events_router
+from shieldx.controllers import events_router, trigger_router
 from shieldx.db import connect_to_mongo,close_mongo_connection, get_database
 import uvicorn
 import asyncio
@@ -34,7 +34,10 @@ app = FastAPI(title="ShieldX API",lifespan=lifespan, description="API para regis
     })
 
 # Include API routes from the service controller under /api/v1
+# Rutas de eventos
 app.include_router(events_router, prefix="/api/v1",tags=["Eventos"],)
+# Rutas de triggers
+app.include_router(trigger_router, prefix="/api/v1", tags=["Triggers"])
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=20000)

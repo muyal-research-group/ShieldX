@@ -1,6 +1,8 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 from datetime import datetime, timezone
+
+""" Modelos de Eventos """
 
 class EventModel(BaseModel):
     service_id: str

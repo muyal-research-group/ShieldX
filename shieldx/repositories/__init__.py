@@ -1,1 +1,2 @@
 from shieldx.repositories.events import EventsRepository
+from shieldx.repositories.trigger_repository import TriggersRepository

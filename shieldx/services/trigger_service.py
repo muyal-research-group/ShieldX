@@ -16,7 +16,7 @@ class TriggerService:
     async def create_trigger(self, trigger: TriggerModel):
         """Crea un nuevo trigger si no existe uno con el mismo nombre."""
         if await self.repository.get_trigger_by_name(trigger.name):
-            raise HTTPException(status_code=400, detail="Trigger already exists")
+            raise HTTPException(status_code=409, detail="Trigger already exists")
         return await self.repository.create_trigger(trigger)
 
     async def get_all_triggers(self):

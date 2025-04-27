@@ -6,29 +6,21 @@ import asyncio
 from contextlib import asynccontextmanager
 from shieldx.db.indexes import create_indexes
 from shieldx.log import Log
-import logging
+from shieldx.log.logger_config import get_logger
 # import LogRecord,INFO,ERROR,DEBUG,WARNING
-import os
 import time as T
+from shieldx import config
 
-SHIELDX_DEBUG = bool(int(os.environ.get("SHIELDX_DEBUG","1")))
-SHIELDX_TITLE = os.environ.get("SHIELDX_TITLE","ShieldX API")
-SHIELDX_API_PREFIX = os.environ.get("SHIELDX_API_PREFIX","/api/v1")
-SHIELDX_HOST = os.environ.get("SHIELDX_HOST","0.0.0.0")
-SHIELDX_PORT = int(os.environ.get("SHIELDX_PORT","20000"))
-SHIELDX_MONGODB_MAX_RETRIES = int(os.environ.get("SHIELDX_MONGODB_MAX_RETRIES","5"))
+SHIELDX_TITLE = config.SHIELDX_TITLE
+SHIELDX_API_PREFIX = config.SHIELDX_API_PREFIX
+SHIELDX_HOST = config.SHIELDX_HOST
+SHIELDX_PORT = config.SHIELDX_PORT
+SHIELDX_VERSION = config.SHIELDX_VERSION
+CONTACT_NAME = config.CONTACT_NAME
+CONTACT_EMAIL = config.CONTACT_EMAIL
+SHIELDX_MONGODB_MAX_RETRIES = config.SHIELDX_MONGODB_MAX_RETRIES
 
-def console_handler_filter(lr:logging.LogRecord):
-    if SHIELDX_DEBUG:
-        return SHIELDX_DEBUG
-    
-    return lr.levelno == logging.INFO or lr.levelno == logging.ERROR or lr.levelno == logging.WARNING
-        
-
-L = Log(
-    name="shieldx-server",
-    console_handler_filter= console_handler_filter
-)
+L =  get_logger("shieldx-server")
 
 
 @asynccontextmanager
@@ -73,11 +65,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=SHIELDX_TITLE,
+    version=SHIELDX_VERSION,
     lifespan=lifespan, 
     description="API para registrar y consultar eventos generados por microservicios.",
     contact={
-        "name": "Equipo ShieldX",
-        "email": "soporte@shieldx.io",
+        "name": CONTACT_NAME,
+        "email": CONTACT_EMAIL,
     })
 
 

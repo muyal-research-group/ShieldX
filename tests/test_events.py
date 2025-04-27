@@ -28,6 +28,7 @@ async def client():
 # 🔸 CREATE EVENT
 @pytest.mark.asyncio
 async def test_create_event(client):
+    await client.post("/api/v1/event-types", json={"event_type": "TestEventType"})
     """
     ✅ Verifica que se pueda crear un evento correctamente.
     """
@@ -35,7 +36,7 @@ async def test_create_event(client):
         "service_id": "service_test",
         "microservice_id": "micro_test",
         "function_id": "func_test",
-        "event_type": "TestEvent",
+        "event_type": "TestEventType",
         "payload": {"key": "value"}
     })
     assert response.status_code == 200
@@ -105,6 +106,8 @@ async def test_get_events_by_function(client):
 # 🔸 UPDATE EVENT
 @pytest.mark.asyncio
 async def test_update_event(client):
+    await client.post("/api/v1/event-types", json={"event_type": "OriginalEvent"})
+
     """
     🔄 Verifica que se pueda actualizar un campo de un evento existente.
     """
@@ -129,6 +132,8 @@ async def test_update_event(client):
 # 🔸 DELETE EVENT
 @pytest.mark.asyncio
 async def test_delete_event(client):
+    await client.post("/api/v1/event-types", json={"event_type": "DeleteEvent"})
+
     """
     ❌ Verifica que se pueda eliminar correctamente un evento existente.
     """

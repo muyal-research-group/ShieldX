@@ -3,8 +3,11 @@ from shieldx.services.event_types_service import EventTypeService
 from shieldx.repositories.event_types_repository import EventTypeRepository
 from shieldx.models.event_types import EventTypeModel
 from shieldx.db import get_database
+from shieldx.log.logger_config import get_logger
+import time as T
 
 router = APIRouter()
+L = get_logger(__name__)
 
 def get_service(db=Depends(get_database)):
     repository = EventTypeRepository(db)
@@ -18,7 +21,15 @@ def get_service(db=Depends(get_database)):
     description="Crea un nuevo tipo de evento que podrá ser asociado a uno o más triggers."
 )
 async def create_event_type(data: EventTypeModel, service: EventTypeService = Depends(get_service)):
-    return await service.create_event_type(data)
+    t1 = T.time()
+    event_type_id = await service.create_event_type(data)
+    # Log de creación
+    L.info({
+        "event": "API.EVENT_TYPE.CREATED",
+        "event_type_id": event_type_id,
+        "time": T.time() - t1
+    })
+    return event_type_id
 
 @router.get(
     "/event-types",
@@ -28,7 +39,15 @@ async def create_event_type(data: EventTypeModel, service: EventTypeService = De
     description="Devuelve todos los tipos de evento registrados en el sistema."
 )
 async def list_event_types(service: EventTypeService = Depends(get_service)):
-    return await service.list_event_types()
+    t1 = T.time()
+    event_types = await service.list_event_types()
+    # Log de consulta de lista
+    L.debug({
+        "event": "API.EVENT_TYPE.LISTED",
+        "count": len(event_types),
+        "time": T.time() - t1
+    })
+    return event_types
 
 @router.get(
     "/event-types/{type_id}",
@@ -38,7 +57,15 @@ async def list_event_types(service: EventTypeService = Depends(get_service)):
     description="Obtiene un tipo de evento específico mediante su identificador único."
 )
 async def get_event_type(type_id: str, service: EventTypeService = Depends(get_service)):
-    return await service.get_event_type(type_id)
+    t1 = T.time()
+    event_type = await service.get_event_type(type_id)
+    # Log de consulta individual
+    L.debug({
+        "event": "API.EVENT_TYPE.FETCHED",
+        "event_type_id": type_id,
+        "time": T.time() - t1
+    })
+    return event_type
 
 @router.delete(
     "/event-types/{type_id}",
@@ -47,4 +74,11 @@ async def get_event_type(type_id: str, service: EventTypeService = Depends(get_s
     description="Elimina de forma permanente un tipo de evento según su identificador."
 )
 async def delete_event_type(type_id: str, service: EventTypeService = Depends(get_service)):
+    t1 = T.time()
     await service.delete_event_type(type_id)
+    # Log de eliminación
+    L.info({
+        "event": "API.EVENT_TYPE.DELETED",
+        "event_type_id": type_id,
+        "time": T.time() - t1
+    })

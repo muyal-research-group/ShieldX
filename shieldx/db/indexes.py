@@ -1,22 +1,12 @@
 from shieldx.db import get_database
 from shieldx.log import Log
-from logging import LogRecord,INFO,ERROR,DEBUG,WARNING
-import os
+from shieldx.log.logger_config import get_logger
 import time as T
 
-DEBUG = bool(int(os.environ.get("SHIELDX_DEBUG","1")))
 
-def console_handler_filter(lr:LogRecord):
-    if DEBUG:
-        return DEBUG
-    
-    return lr.levelno == INFO or lr.levelno == ERROR or lr.levelno == WARNING
-        
+L = get_logger(__name__)
 
-L = Log(
-    name=__name__,
-    console_handler_filter= console_handler_filter
-)
+
 async def create_indexes():
     """
     Crea índices en la colección 'events' para mejorar la eficiencia de las consultas.

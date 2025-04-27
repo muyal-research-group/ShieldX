@@ -1,10 +1,14 @@
-import os
-import sys
-import logging
+import os, sys, logging, json, threading
+from shieldx import config
 from logging.handlers import TimedRotatingFileHandler
-import json
-import threading
 from option import NONE, Option
+
+LOG_PATH            = config.LOG_PATH                   
+LOG_LEVEL           = config.LOG_LEVEL
+LOG_ROTATION_WHEN   = config.LOG_ROTATION_WHEN
+LOG_ROTATION_INTERVAL = config.LOG_ROTATION_INTERVAL
+LOG_TO_FILE         = config.LOG_TO_FILE
+LOG_ERROR_FILE      = config.LOG_ERROR_FILE
 
 
 class DumbLogger(object):
@@ -51,7 +55,7 @@ class JsonFormatter(logging.Formatter):
         Returns:
             str: A JSON-formatted log string.
         """
-        thread_id = threading.current_thread().getName()
+        thread_id = threading.current_thread().name
         log_data = {
             'timestamp': self.formatTime(record),
             'level': record.levelname,
@@ -75,24 +79,24 @@ class Log(logging.Logger):
     """
 
     def __init__(self,
-                 formatter: logging.Formatter = JsonFormatter(),
-                 name: str = "shieldx",
-                 level: int = logging.DEBUG,
-                 path: str = "/log",
-                 disabled: bool = False,
-                 console_handler_filter=lambda record: record.levelno == logging.DEBUG,
-                 file_handler_filter=lambda record: record.levelno == logging.INFO,
-                 console_handler_level: int = logging.DEBUG,
-                 file_handler_level: int = logging.INFO,
-                 error_log: bool = False,
-                 filename: Option[str] = NONE,
-                 output_path: Option[str] = NONE,
-                 error_output_path: Option[str] = NONE,
-                 create_folder: bool = True,
-                 to_file: bool = True,
-                 when: str = "m",
-                 interval: int = 10,
-                 ):
+                formatter: logging.Formatter = JsonFormatter(),
+                name: str = "shieldx",
+                level: int = getattr(logging, LOG_LEVEL.upper(), logging.DEBUG),
+                path: str = LOG_PATH,
+                disabled: bool = False,
+                console_handler_filter=lambda record: record.levelno == logging.DEBUG,
+                file_handler_filter=lambda record: record.levelno == logging.INFO,
+                console_handler_level: int = logging.DEBUG,
+                file_handler_level: int = logging.INFO,
+                error_log: bool = LOG_ERROR_FILE,
+                filename: Option[str] = NONE,
+                output_path: Option[str] = NONE,
+                error_output_path: Option[str] = NONE,
+                create_folder: bool = True,
+                to_file: bool = LOG_TO_FILE,
+                when: str = LOG_ROTATION_WHEN,
+                interval: int = LOG_ROTATION_INTERVAL
+                ):
         """
         Initialize the logger with optional console and file handlers.
 

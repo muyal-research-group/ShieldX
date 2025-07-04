@@ -1,2 +1,3 @@
 from shieldx.repositories.events import EventsRepository
 from shieldx.repositories.trigger_repository import TriggersRepository
+from shieldx.repositories.event_types_repository import EventTypeRepository

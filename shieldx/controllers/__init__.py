@@ -1,2 +1,7 @@
 from shieldx.controllers.events import router as events_router
 from shieldx.controllers.trigger_controller import router as trigger_router
+from shieldx.controllers.event_types_controller import router as event_types_router
+from shieldx.controllers.events_triggers_controller import router as events_triggers_router
+from shieldx.controllers.triggers_triggers_controller import router as triggers_triggers_router
+from shieldx.controllers.rules_trigger_controller import router as rules_trigger_router
+from shieldx.controllers.rules_controller import router as rules_router

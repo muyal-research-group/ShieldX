@@ -1,7 +1,10 @@
 from fastapi import HTTPException
 from shieldx.models.trigger_models import TriggerModel
 from shieldx.repositories import TriggersRepository
+from shieldx.log.logger_config import get_logger
+import time as T
 
+L = get_logger(__name__)
 
 class TriggerService:
     """
@@ -14,32 +17,95 @@ class TriggerService:
         self.repository = repository
 
     async def create_trigger(self, trigger: TriggerModel):
-        """Crea un nuevo trigger si no existe uno con el mismo nombre."""
+        """
+        Crea un nuevo trigger si no existe uno con el mismo nombre y registra la operación.
+        """
+        t1 = T.time()
         if await self.repository.get_trigger_by_name(trigger.name):
-            raise HTTPException(status_code=400, detail="Trigger already exists")
-        return await self.repository.create_trigger(trigger)
+            L.warning({
+                "event": "TRIGGER.CREATE.CONFLICT",
+                "name": trigger.name,
+                "time": T.time() - t1
+            })
+            raise HTTPException(status_code=409, detail="Trigger already exists")
+        created_trigger = await self.repository.create_trigger(trigger)
+        L.info({
+            "event": "TRIGGER.CREATED",
+            "name": trigger.name,
+            "time": T.time() - t1
+        })
+        return created_trigger
 
     async def get_all_triggers(self):
-        """Devuelve la lista de todos los triggers almacenados."""
-        return await self.repository.get_all_triggers()
+        """
+        Devuelve la lista de todos los triggers almacenados y registra la operación.
+        """
+        t1 = T.time()
+        triggers = await self.repository.get_all_triggers()
+        L.debug({
+            "event": "TRIGGER.LIST.ALL",
+            "count": len(triggers),
+            "time": T.time() - t1
+        })
+        return triggers
 
     async def get_trigger(self, name: str):
-        """Obtiene un trigger específico por su nombre."""
+        """
+        Obtiene un trigger específico por su nombre y registra la operación.
+        """
+        t1 = T.time()
         trigger = await self.repository.get_trigger_by_name(name)
         if not trigger:
+            L.warning({
+                "event": "TRIGGER.NOT_FOUND",
+                "name": name,
+                "time": T.time() - t1
+            })
             raise HTTPException(status_code=404, detail="Trigger not found")
+        L.debug({
+            "event": "TRIGGER.FETCHED",
+            "name": name,
+            "time": T.time() - t1
+        })
         return trigger
 
     async def update_trigger(self, name: str, updated: TriggerModel):
-        """Actualiza un trigger existente con nuevos datos."""
+        """
+        Actualiza un trigger existente con nuevos datos y registra la operación.
+        """
+        t1 = T.time()
         if not await self.repository.get_trigger_by_name(name):
+            L.warning({
+                "event": "TRIGGER.UPDATE.NOT_FOUND",
+                "name": name,
+                "time": T.time() - t1
+            })
             raise HTTPException(status_code=404, detail="Trigger not found")
         update_data = updated.model_dump(by_alias=True, exclude_unset=True)
-        return await self.repository.update_trigger(name, update_data)
+        updated_trigger = await self.repository.update_trigger(name, update_data)
+        L.info({
+            "event": "TRIGGER.UPDATED",
+            "name": name,
+            "time": T.time() - t1
+        })
+        return updated_trigger
 
     async def delete_trigger(self, name: str):
-        """Elimina un trigger por su nombre."""
+        """
+        Elimina un trigger por su nombre y registra la operación.
+        """
+        t1 = T.time()
         if not await self.repository.get_trigger_by_name(name):
+            L.warning({
+                "event": "TRIGGER.DELETE.NOT_FOUND",
+                "name": name,
+                "time": T.time() - t1
+            })
             raise HTTPException(status_code=404, detail="Trigger not found")
         await self.repository.delete_trigger(name)
+        L.info({
+            "event": "TRIGGER.DELETED",
+            "name": name,
+            "time": T.time() - t1
+        })
         return {"detail": f"Trigger '{name}' deleted"}

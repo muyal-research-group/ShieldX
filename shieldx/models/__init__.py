@@ -1,70 +1,28 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Any, Dict
+from typing import Optional, Any
 from datetime import datetime, timezone
 
-""" Modelos de Eventos """
+"""Modelos de Eventos"""
 
 class EventModel(BaseModel):
+    """
+    Modelo base que representa un evento generado dentro del sistema ShieldX.
+
+    Este modelo se utiliza para registrar la ejecución de funciones dentro de un microservicio
+    y contiene información clave para su trazabilidad y procesamiento.
+
+    Atributos:
+    - service_id: Identificador del servicio que origina el evento.
+    - microservice_id: Identificador del microservicio específico.
+    - function_id: Identificador de la función involucrada.
+    - event_type: Tipo de evento generado (por ejemplo, EncryptStart, SkmeansDone, etc.).
+    - timestamp: Fecha y hora en la que ocurrió el evento (UTC por defecto).
+    - payload: Carga útil opcional con datos adicionales del evento.
+    """
+
     service_id: str
     microservice_id: str
     function_id: str
     event_type: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     payload: Optional[Any] = None
-
-class EncryptStart(EventModel):
-    """
-    Evento específico para cuando se inicia el cifrado.
-    """
-    
-    source: str  # De dónde vienen los datos
-    sink: str # Dónde se guardarán después de cifrarse
-
-
-class EncryptDone(EventModel):
-    """
-    Evento que indica que el cifrado ha finalizado.
-    """
-    encrypted_file: str = Field(..., title="Encrypted File Path")
-
-
-class SkmeansStart(EventModel):
-    """
-    Evento que indica que se inicia el clustering con SKMeans.
-    """
-    cluster_count: int = Field(..., title="Number of Clusters", ge=1)
-
-
-class SkmeansDone(EventModel):
-    """
-    Evento que indica que el clustering ha finalizado.
-    """
-    output_data: str = Field(..., title="Path to Clustered Data")
-
-
-class DecryptStart(EventModel):
-    """
-    Evento que indica que se inicia el descifrado.
-    """
-    encrypted_file: str = Field(..., title="Encrypted File Path")
-
-
-class DecryptDone(EventModel):
-    """
-    Evento que indica que el descifrado ha finalizado.
-    """
-    decrypted_file: str = Field(..., title="Decrypted File Path")
-
-
-class PlottingStart(EventModel):
-    """
-    Evento que indica que la visualización de datos ha comenzado.
-    """
-    visualization_type: str = Field(..., title="Type of Visualization")
-
-
-class PlottingDone(EventModel):
-    """
-    Evento que indica que la visualización de datos ha finalizado.
-    """
-    graph_path: str = Field(..., title="Path to Generated Graph")

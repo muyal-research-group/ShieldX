@@ -3,6 +3,7 @@ from shieldx.repositories.event_types_repository import EventTypeRepository
 from shieldx.models.event_types import EventTypeModel
 from shieldx.log.logger_config import get_logger
 import time as T
+from bson import ObjectId
 
 L = get_logger(__name__)  # Logger específico para este módulo
 
@@ -29,7 +30,7 @@ class EventTypeService:
         """
         t1 = T.time()
         try:
-            event_type_id = await self.repository.create(data.model_dump(by_alias=True, exclude_none=True))
+            event_type_id = await self.repository.insert_one(data)
             # Log de éxito
             L.info({
                 "event": "EVENT_TYPE.CREATED",
@@ -50,7 +51,7 @@ class EventTypeService:
         """
         t1 = T.time()
         try:
-            event_types = await self.repository.get_all()
+            event_types = await self.repository.find_all()
             # Log de depuración con cantidad de resultados
             L.debug({
                 "event": "EVENT_TYPE.LIST",
@@ -71,7 +72,7 @@ class EventTypeService:
         :return: Objeto EventTypeModel si se encuentra, de lo contrario lanza HTTPException 404.
         """
         t1 = T.time()
-        result = await self.repository.get_by_id(event_type_id)
+        result = await self.repository.find_one({"_id": ObjectId(event_type_id)})
 
         if not result:
             # Log de advertencia si no se encuentra
@@ -89,7 +90,7 @@ class EventTypeService:
             "time": T.time() - t1
         })
         return result 
-
+        
     async def delete_event_type(self, event_type_id: str):
         """
         Elimina un tipo de evento de la base de datos por su ID y registra la operación.
@@ -97,7 +98,7 @@ class EventTypeService:
         :param event_type_id: Identificador único del tipo de evento a eliminar.
         """
         t1 = T.time()
-        result = await self.repository.get_by_id(event_type_id)
+        result = await self.repository.find_one({"_id": ObjectId(event_type_id)})
 
         if not result:
             # Log si no se encuentra el tipo de evento
@@ -108,7 +109,7 @@ class EventTypeService:
             })
             raise HTTPException(status_code=404, detail="Event type not found")
         
-        await self.repository.delete(event_type_id)
+        await self.repository.delete_one({"_id": ObjectId(event_type_id)})
         # Log de eliminación exitosa
         L.info({
             "event": "EVENT_TYPE.DELETED",

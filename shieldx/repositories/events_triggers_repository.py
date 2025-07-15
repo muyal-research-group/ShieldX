@@ -1,5 +1,4 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from bson import ObjectId
 from shieldx.models.events_triggers import EventsTriggersModel
 from shieldx.log.logger_config import get_logger
 import time as T

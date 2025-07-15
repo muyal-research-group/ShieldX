@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from typing import List
 from shieldx.models.trigger_models import TriggerModel
 from shieldx.services.trigger_service import TriggerService
-from shieldx.db import get_collection
+from shieldx.db import get_collection, get_database
 from shieldx.repositories import TriggersRepository
 from shieldx.log.logger_config import get_logger
 import time as T
@@ -11,9 +11,9 @@ router = APIRouter()
 L = get_logger(__name__)
 
 # Crea la instancia del servicio pasando la colección MongoDB
-def get_triggers_service() -> TriggerService:
-    collection = get_collection("triggers")  # nombre de la colección en tu DB
-    repository = TriggersRepository(collection)
+
+def get_triggers_service(db=Depends(get_database)):
+    repository = TriggersRepository(db)
     return TriggerService(repository)
 
 @router.post(

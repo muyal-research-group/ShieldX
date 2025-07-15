@@ -55,7 +55,7 @@ class JsonFormatter(logging.Formatter):
         Returns:
             str: A JSON-formatted log string.
         """
-        thread_id = threading.current_thread().name
+        thread_id = threading.current_thread().getName()
         log_data = {
             'timestamp': self.formatTime(record),
             'level': record.levelname,

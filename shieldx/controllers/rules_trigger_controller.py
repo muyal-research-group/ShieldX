@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from shieldx.db import get_database
-from shieldx.services.rules_trigger_service import RulesTriggerService
-from shieldx.repositories.rules_trigger_repository import RulesTriggerRepository
-from shieldx.models.rules_trigger import RulesTriggerModel
-from shieldx.models.rule_models import RuleModel
-from shieldx.repositories.rules_repository import RuleRepository
-from shieldx.services.rules_service import RuleService
+from shieldx.dtos import RulesTriggerDTO, IDResponseDTO
+from shieldx.models import RulesTriggerModel
+from shieldx.models import RuleModel
+from shieldx.services import RulesTriggerService
+from shieldx.services import RuleService
+from shieldx.repositories import RulesTriggerRepository
+from shieldx.repositories import RuleRepository
+
 from shieldx.log.logger_config import get_logger
 import time as T
 
@@ -18,7 +20,7 @@ def get_service(db=Depends(get_database)):
 
 @router.get(
     "/triggers/{trigger_id}/rules",
-    response_model=list[RulesTriggerModel],
+    response_model=list[RulesTriggerDTO],
     status_code=status.HTTP_200_OK,
     summary="Listar reglas asociadas a un trigger",
     description="Devuelve todas las reglas actualmente vinculadas a un trigger específico."
@@ -32,7 +34,7 @@ async def list_rules(trigger_id: str, service: RulesTriggerService = Depends(get
         "count": len(rules),
         "time": T.time() - t1
     })
-    return rules
+    return [RulesTriggerDTO.model_validate(r.model_dump(by_alias=True)) for r in rules]
 
 @router.post(
     "/triggers/{trigger_id}/rules/{rule_id}",
@@ -60,7 +62,7 @@ async def link_rule(trigger_id: str, rule_id: str, service: RulesTriggerService 
 
 @router.post(
     "/triggers/{trigger_id}/rules",
-    response_model=str,
+    response_model=IDResponseDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Crear y vincular una nueva regla",
     description="Crea una nueva regla y la vincula automáticamente al trigger indicado."
@@ -83,7 +85,7 @@ async def create_and_link_rule(trigger_id: str, rule_data: RuleModel, db=Depends
         "rule_id": rule_id,
         "time": T.time() - t1
     })
-    return rule_id
+    return IDResponseDTO(id=rule_id)
 
 @router.delete(
     "/triggers/{trigger_id}/rules/{rule_id}",

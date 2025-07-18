@@ -39,7 +39,7 @@ async def test_create_event(client):
         "event_type": "TestEventType",
         "payload": {"key": "value"}
     })
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert "event_id" in response.json()
 
 # 🔸 GET ALL EVENTS
@@ -149,5 +149,5 @@ async def test_delete_event(client):
 
     # Eliminar evento
     delete_response = await client.delete(f"/api/v1/events/{event_id}")
-    assert delete_response.status_code == 200
-    assert delete_response.json()["message"] == "Evento eliminado"
+    assert delete_response.status_code == 204
+    

@@ -85,7 +85,7 @@ async def created_rule_id(client):
     Crea una regla válida y devuelve su ID.
     """
     response = await client.post("/api/v1/rules", json=valid_rule_payload)
-    return response.text.strip('"')
+    return response.json()["id"]
 
 @pytest.mark.asyncio
 async def test_get_rule_by_id(client, created_rule_id):

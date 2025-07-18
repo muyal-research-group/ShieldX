@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from shieldx.models import EventModel
-from shieldx.repositories.events_repository import EventsRepository
+from shieldx.repositories import EventsRepository
 from bson import ObjectId
 from typing import List, Optional
 from shieldx.log.logger_config import get_logger

@@ -1,5 +1,5 @@
 from shieldx.log.logger_config import get_logger
-from shieldx.repositories.rules_trigger_repository import RulesTriggerRepository
+from shieldx.repositories import RulesTriggerRepository
 import time as T
 
 L = get_logger(__name__)

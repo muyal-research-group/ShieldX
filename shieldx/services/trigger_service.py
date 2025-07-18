@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from shieldx.models.trigger_models import TriggerModel
+from shieldx.models import TriggerModel
 from shieldx.repositories import TriggersRepository
 from shieldx.log.logger_config import get_logger
 from bson import ObjectId

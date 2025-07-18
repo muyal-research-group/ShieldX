@@ -1,4 +1,4 @@
-from shieldx.repositories.triggers_triggers_repository import TriggersTriggersRepository
+from shieldx.repositories import TriggersTriggersRepository
 from shieldx.log.logger_config import get_logger
 import time as T
 

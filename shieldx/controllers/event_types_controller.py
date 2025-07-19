@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status
-from shieldx.dtos import IDResponseDTO
-from shieldx.dtos import EventTypeDTO
 from shieldx.models import EventTypeModel
 from shieldx.repositories import EventTypeRepository
 from shieldx.services import EventTypeService
 from shieldx.db import get_database
 from shieldx.log.logger_config import get_logger
+import shieldx_core.dtos as DTOS
+from typing import List
 import time as T
 
 router = APIRouter()
@@ -15,9 +15,10 @@ def get_service(db=Depends(get_database)):
     repository = EventTypeRepository(db)
     return EventTypeService(repository)
 
+
 @router.post(
     "/event-types",
-    response_model=IDResponseDTO,
+    response_model=DTOS.IDResponseDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Crear un tipo de evento",
     description="Crea un nuevo tipo de evento que podrá ser asociado a uno o más triggers."
@@ -31,11 +32,11 @@ async def create_event_type(data: EventTypeModel, service: EventTypeService = De
         "event_type_id": event_type_id,
         "time": T.time() - t1
     })
-    return IDResponseDTO(id=event_type_id)
+    return DTOS.IDResponseDTO(id=event_type_id)
 
 @router.get(
     "/event-types",
-    response_model=list[EventTypeDTO],
+    response_model=List[DTOS.EventTypeDTO],
     status_code=status.HTTP_200_OK,
     summary="Listar tipos de evento",
     description="Devuelve todos los tipos de evento registrados en el sistema."
@@ -49,11 +50,11 @@ async def list_event_types(service: EventTypeService = Depends(get_service)):
         "count": len(event_types),
         "time": T.time() - t1
     })
-    return [EventTypeDTO.model_validate(et.model_dump(by_alias=True)) for et in event_types]
+    return [DTOS.EventTypeDTO.model_validate(et.model_dump(by_alias=True)) for et in event_types]
 
 @router.get(
     "/event-types/{type_id}",
-    response_model=EventTypeDTO,
+    response_model=DTOS.EventTypeDTO,
     status_code=status.HTTP_200_OK,
     summary="Obtener tipo de evento por ID",
     description="Obtiene un tipo de evento específico mediante su identificador único."
@@ -67,7 +68,7 @@ async def get_event_type(type_id: str, service: EventTypeService = Depends(get_s
         "event_type_id": type_id,
         "time": T.time() - t1
     })
-    return EventTypeDTO.model_validate(event_type.model_dump(by_alias=True))
+    return DTOS.EventTypeDTO.model_validate(event_type.model_dump(by_alias=True))
 
 
 @router.delete(

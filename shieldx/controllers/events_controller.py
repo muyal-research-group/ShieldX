@@ -1,7 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query, status
 from typing import List, Optional
-from shieldx.dtos import EventDTO
-from shieldx.dtos import MessageWithIDDTO
 from shieldx.models import EventModel
 from shieldx.services import EventsService
 from shieldx.repositories import EventsRepository
@@ -9,6 +7,7 @@ from shieldx.repositories import EventTypeRepository
 from shieldx.db import get_database
 from shieldx.log.logger_config import get_logger
 import time as T
+import shieldx_core.dtos as DTOS
 
 router = APIRouter()
 L = get_logger(__name__)
@@ -22,7 +21,7 @@ def get_events_service(db=Depends(get_database)) -> EventsService:
     event_type_repo = EventTypeRepository(db)
     return EventsService(event_repo, event_type_repo)
 
-@router.get("/events", response_model=List[EventDTO], summary="Listar eventos",
+@router.get("/events", response_model=List[DTOS.EventDTO], summary="Listar eventos",
     description="Recupera una lista de eventos registrados en el sistema...")
 async def get_events(
     events_service: EventsService = Depends(get_events_service),
@@ -45,10 +44,10 @@ async def get_events(
         "count": len(events),
         "time": T.time() - t1
     })
-    return [EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
+    return [DTOS.EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
 
 
-@router.get("/events/service/{service_id}", response_model=List[EventDTO], summary="Buscar eventos por service_id",
+@router.get("/events/service/{service_id}", response_model=List[DTOS.EventDTO], summary="Buscar eventos por service_id",
     description="Recupera todos los eventos asociados al `service_id` especificado.")
 async def get_events_by_service(service_id: str, events_service: EventsService = Depends(get_events_service)):
     t1 = T.time()
@@ -59,9 +58,9 @@ async def get_events_by_service(service_id: str, events_service: EventsService =
         "count": len(events),
         "time": T.time() - t1
     })
-    return [EventDTO.model_validate(e) for e in events]
+    return [DTOS.EventDTO.model_validate(e) for e in events]
 
-@router.get("/events/microservice/{microservice_id}", response_model=List[EventDTO], summary="Buscar eventos por microservice_id",
+@router.get("/events/microservice/{microservice_id}", response_model=List[DTOS.EventDTO], summary="Buscar eventos por microservice_id",
     description="Recupera todos los eventos asociados al `microservice_id` especificado.")
 async def get_events_by_microservice(microservice_id: str, events_service: EventsService = Depends(get_events_service)):
     t1 = T.time()
@@ -72,10 +71,10 @@ async def get_events_by_microservice(microservice_id: str, events_service: Event
         "count": len(events),
         "time": T.time() - t1
     })
-    return [EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
+    return [DTOS.EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
 
 
-@router.get("/events/function/{function_id}", response_model=List[EventDTO], summary="Buscar eventos por function_id",
+@router.get("/events/function/{function_id}", response_model=List[DTOS.EventDTO], summary="Buscar eventos por function_id",
     description="Recupera todos los eventos asociados al `function_id` especificado.")
 async def get_events_by_function(function_id: str, events_service: EventsService = Depends(get_events_service)):
     t1 = T.time()
@@ -86,10 +85,10 @@ async def get_events_by_function(function_id: str, events_service: EventsService
         "count": len(events),
         "time": T.time() - t1
     })
-    return [EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
+    return [DTOS.EventDTO.model_validate(e.model_dump(by_alias=True)) for e in events]
 
 
-@router.get("/events/{event_id}", response_model=EventDTO, summary="Obtener evento por ID",
+@router.get("/events/{event_id}", response_model=DTOS.EventDTO, summary="Obtener evento por ID",
     description="Recupera los detalles de un evento específico utilizando su `event_id`.")
 async def get_event_by_id(event_id: str, events_service: EventsService = Depends(get_events_service)):
     t1 = T.time()
@@ -106,9 +105,9 @@ async def get_event_by_id(event_id: str, events_service: EventsService = Depends
         "event_id": event_id,
         "time": T.time() - t1
     })
-    return EventDTO.model_validate(event)
+    return DTOS.EventDTO.model_validate(event)
 
-@router.post("/events", response_model=MessageWithIDDTO, summary="Crear un nuevo evento",
+@router.post("/events", response_model=DTOS.MessageWithIDDTO, summary="Crear un nuevo evento",
     description="Registra un nuevo evento en la base de datos utilizando el esquema definido en el modelo `EventModel`.",
     status_code=status.HTTP_201_CREATED)
 async def create_event(event: EventModel, events_service: EventsService = Depends(get_events_service)):
@@ -125,9 +124,9 @@ async def create_event(event: EventModel, events_service: EventsService = Depend
         "event_id": created_event["event_id"],
         "time": T.time() - t1
     })
-    return MessageWithIDDTO(message="Evento creado exitosamente", event_id=created_event["event_id"])
+    return DTOS.MessageWithIDDTO(message="Evento creado exitosamente", event_id=created_event["event_id"])
 
-@router.put("/events/{event_id}", response_model=EventDTO, summary="Actualizar evento",
+@router.put("/events/{event_id}", response_model=DTOS.EventDTO, summary="Actualizar evento",
     description="Actualiza los campos de un evento existente utilizando su `event_id`.")
 async def update_event(event_id: str, update_data: dict, events_service: EventsService = Depends(get_events_service)):
     t1 = T.time()
@@ -144,7 +143,7 @@ async def update_event(event_id: str, update_data: dict, events_service: EventsS
         "event_id": event_id,
         "time": T.time() - t1
     })
-    return EventDTO.model_validate(updated_event)
+    return DTOS.EventDTO.model_validate(updated_event)
 
 @router.delete("/events/{event_id}", summary="Eliminar evento",
                 status_code=status.HTTP_204_NO_CONTENT,

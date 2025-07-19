@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from typing import List
-from shieldx.dtos import TriggerDTO
 from shieldx.models import TriggerModel
 from shieldx.services import TriggerService
 from shieldx.db import get_database
 from shieldx.repositories import TriggersRepository
 from shieldx.log.logger_config import get_logger
 import time as T
+import shieldx_core.dtos as DTOS
+
 
 router = APIRouter()
 L = get_logger(__name__)
@@ -19,7 +20,7 @@ def get_triggers_service(db=Depends(get_database)):
 
 @router.post(
     "/triggers/",
-    response_model=TriggerDTO,
+    response_model=DTOS.TriggerDTO,
     response_model_by_alias=True,
     status_code=status.HTTP_201_CREATED,
     summary="Crear un nuevo trigger",
@@ -37,11 +38,11 @@ async def create_trigger(trigger: TriggerModel, service: TriggerService = Depend
         "name": trigger.name,
         "time": T.time() - t1
     })
-    return TriggerDTO.model_validate(result.model_dump(by_alias=True))
+    return DTOS.TriggerDTO.model_validate(result.model_dump(by_alias=True))
 
 @router.get(
     "/triggers/",
-    response_model=List[TriggerDTO],
+    response_model=List[DTOS.TriggerDTO],
     response_model_by_alias=True,
     status_code=status.HTTP_200_OK,
     summary="Obtener todos los triggers",
@@ -58,11 +59,11 @@ async def get_all_triggers(service: TriggerService = Depends(get_triggers_servic
         "count": len(triggers),
         "time": T.time() - t1
     })
-    return [TriggerDTO.model_validate(t.model_dump(by_alias=True)) for t in triggers]
+    return [DTOS.TriggerDTO.model_validate(t.model_dump(by_alias=True)) for t in triggers]
 
 @router.get(
     "/triggers/{name}",
-    response_model=TriggerDTO,
+    response_model=DTOS.TriggerDTO,
     response_model_by_alias=True,
     status_code=status.HTTP_200_OK,
     summary="Obtener un trigger por nombre",
@@ -79,11 +80,11 @@ async def get_trigger(name: str, service: TriggerService = Depends(get_triggers_
         "name": name,
         "time": T.time() - t1
     })
-    return TriggerDTO.model_validate(trigger.model_dump(by_alias=True))
+    return DTOS.TriggerDTO.model_validate(trigger.model_dump(by_alias=True))
 
 @router.put(
     "/triggers/{name}",
-    response_model=TriggerDTO,
+    response_model=DTOS.TriggerDTO,
     status_code=status.HTTP_200_OK,
     summary="Actualizar un trigger por nombre",
     description=(
@@ -99,7 +100,7 @@ async def update_trigger(name: str, updated_trigger: TriggerModel, service: Trig
         "name": name,
         "time": T.time() - t1
     })
-    return TriggerDTO.model_validate(updated.model_dump(by_alias=True))
+    return DTOS.TriggerDTO.model_validate(updated.model_dump(by_alias=True))
 
 @router.delete(
     "/triggers/{name}",

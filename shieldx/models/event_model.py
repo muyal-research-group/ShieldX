@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Any
 from datetime import datetime, timezone
+from bson import ObjectId
 
 """Modelos de Eventos"""
 
@@ -19,10 +20,22 @@ class EventModel(BaseModel):
     - timestamp: Fecha y hora en la que ocurrió el evento (UTC por defecto).
     - payload: Carga útil opcional con datos adicionales del evento.
     """
-
+    Event_id: Optional[str] = Field(default=None, alias="_id")
     service_id: str
     microservice_id: str
     function_id: str
     event_type: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     payload: Optional[Any] = None
+
+    @field_validator("Event_id", mode="before")
+    def convert_object_id(cls, v):
+        if isinstance(v, ObjectId):
+            return str(v)
+        return v
+
+    model_config = {
+        "populate_by_name": True,
+        "from_attributes": True,
+        "json_encoders": {ObjectId: str}
+    }

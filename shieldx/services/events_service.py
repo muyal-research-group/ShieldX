@@ -51,7 +51,7 @@ class EventsService:
                 "event_id": created_event,
                 "time": T.time() - t1
             })
-            return {"event_id": str(created_event)}
+            return created_event
 
         L.error({
             "event": "EVENT.CREATE.FAILED",
@@ -113,17 +113,17 @@ class EventsService:
         """
         t1 = T.time()
         #event = await self.repository.find_event_by_id(event_id)
-        event = await self.repository.find_one(event_id)
+        event = await self.repository.find_one({"_id": ObjectId(event_id)})
         if event:
             L.debug({
                 "event": "EVENT.FETCH.BY_ID",
-                "event_id": event,
+                "event_id": str(event.Event_id),
                 "time": T.time() - t1
             })
         else:
             L.warning({
                 "event": "EVENT.NOT_FOUND",
-                "event_id": event,
+                "event_id": str(event.Event_id),
                 "time": T.time() - t1
             })
         return event

@@ -16,13 +16,16 @@ dependencies = [
     "aio-pika (>=9.5.5,<10.0.0)",
     "httpx (>=0.28.0)",
     "httpcore (>=1.0.7)",
-    "shieldx-core (>=0.0.1a0,<0.0.2)",
+    "shieldx-core (==0.0.1a5)",
 ]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 pytest-asyncio = "^0.26.0"
 
+
+[tool.poetry.dependencies]
+shieldx-core = {source = "test"}
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

@@ -20,8 +20,7 @@ def get_triggers_service(db=Depends(get_database)):
 
 @router.post(
     "/triggers/",
-    response_model=DTOS.TriggerDTO,
-    response_model_by_alias=True,
+    response_model=DTOS.MessageWithIDDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Crear un nuevo trigger",
     description=(
@@ -30,7 +29,7 @@ def get_triggers_service(db=Depends(get_database)):
         "que contenga el `target` y un diccionario de `parameters`, definidos como `ParameterDetailModel`."
     ),
 )
-async def create_trigger(trigger: TriggerModel, service: TriggerService = Depends(get_triggers_service)):
+async def create_trigger(trigger: DTOS.TriggerCreateDTO, service: TriggerService = Depends(get_triggers_service)):
     t1 = T.time()
     result = await service.create_trigger(trigger)
     L.info({
@@ -38,12 +37,11 @@ async def create_trigger(trigger: TriggerModel, service: TriggerService = Depend
         "name": trigger.name,
         "time": T.time() - t1
     })
-    return DTOS.TriggerDTO.model_validate(result.model_dump(by_alias=True))
+    return DTOS.MessageWithIDDTO(message="Trigger Created", id=str(result.trigger_id))
 
 @router.get(
     "/triggers/",
-    response_model=List[DTOS.TriggerDTO],
-    response_model_by_alias=True,
+    response_model=List[DTOS.TriggerResponseDTO],
     status_code=status.HTTP_200_OK,
     summary="Obtener todos los triggers",
     description=(
@@ -59,12 +57,11 @@ async def get_all_triggers(service: TriggerService = Depends(get_triggers_servic
         "count": len(triggers),
         "time": T.time() - t1
     })
-    return [DTOS.TriggerDTO.model_validate(t.model_dump(by_alias=True)) for t in triggers]
+    return [DTOS.TriggerResponseDTO.model_validate(t.model_dump(by_alias=True)) for t in triggers]
 
 @router.get(
     "/triggers/{name}",
-    response_model=DTOS.TriggerDTO,
-    response_model_by_alias=True,
+    response_model=DTOS.TriggerResponseDTO,
     status_code=status.HTTP_200_OK,
     summary="Obtener un trigger por nombre",
     description=(
@@ -80,11 +77,11 @@ async def get_trigger(name: str, service: TriggerService = Depends(get_triggers_
         "name": name,
         "time": T.time() - t1
     })
-    return DTOS.TriggerDTO.model_validate(trigger.model_dump(by_alias=True))
+    return DTOS.TriggerResponseDTO.model_validate(trigger.model_dump(by_alias=True))
 
 @router.put(
     "/triggers/{name}",
-    response_model=DTOS.TriggerDTO,
+    response_model=DTOS.MessageWithIDDTO,
     status_code=status.HTTP_200_OK,
     summary="Actualizar un trigger por nombre",
     description=(
@@ -92,7 +89,7 @@ async def get_trigger(name: str, service: TriggerService = Depends(get_triggers_
         "Se debe enviar el objeto `TriggerModel` actualizado, incluyendo cualquier cambio en sus reglas y parámetros."
     )
 )
-async def update_trigger(name: str, updated_trigger: TriggerModel, service: TriggerService = Depends(get_triggers_service)):
+async def update_trigger(name: str, updated_trigger: DTOS.TriggerCreateDTO, service: TriggerService = Depends(get_triggers_service)):
     t1 = T.time()
     updated = await service.update_trigger(name, updated_trigger)
     L.info({
@@ -100,7 +97,7 @@ async def update_trigger(name: str, updated_trigger: TriggerModel, service: Trig
         "name": name,
         "time": T.time() - t1
     })
-    return DTOS.TriggerDTO.model_validate(updated.model_dump(by_alias=True))
+    return DTOS.MessageWithIDDTO(message="Trigger Updated", id= str(updated.trigger_id))
 
 @router.delete(
     "/triggers/{name}",

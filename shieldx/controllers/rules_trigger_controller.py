@@ -60,12 +60,12 @@ async def link_rule(trigger_id: str, rule_id: str, service: RulesTriggerService 
 
 @router.post(
     "/triggers/{trigger_id}/rules",
-    response_model=DTOS.IDResponseDTO,
+    response_model=DTOS.MessageWithIDDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Crear y vincular una nueva regla",
     description="Crea una nueva regla y la vincula automáticamente al trigger indicado."
 )
-async def create_and_link_rule(trigger_id: str, rule_data: RuleModel, db=Depends(get_database)):
+async def create_and_link_rule(trigger_id: str, rule_data: DTOS.RuleCreateDTO, db=Depends(get_database)):
     t1 = T.time()
     # Crear la nueva regla
     rule_repo = RuleRepository(db)
@@ -83,7 +83,7 @@ async def create_and_link_rule(trigger_id: str, rule_data: RuleModel, db=Depends
         "rule_id": rule_id,
         "time": T.time() - t1
     })
-    return DTOS.IDResponseDTO(id=rule_id)
+    return DTOS.MessageWithIDDTO(message= "Rule created and linked", id=rule_id)
 
 @router.delete(
     "/triggers/{trigger_id}/rules/{rule_id}",

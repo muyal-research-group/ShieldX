@@ -5,4 +5,6 @@ build/
 dist/*
 .github/workflows/publish-to-test-pipy-backup.yml
 **/*.lock
+htmlcov/
+.coverage
 # **/*/publish.sh

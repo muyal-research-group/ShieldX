@@ -54,15 +54,15 @@ jobs:
         continue-on-error: true  
         
       - name: Wait for MongoDB to be ready
-              run: |
-                for i in {1..10}; do
-                  if mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
-                    echo "MongoDB is up!"
-                    break
-                  fi
-                  echo "Waiting for MongoDB..."
-                  sleep 3
-                done
+        run: |
+          for i in {1..10}; do
+            if mongosh --eval "db.adminCommand('ping')" > /dev/null 2>&1; then
+              echo "MongoDB is up!"
+              break
+            fi
+            echo "Waiting for MongoDB..."
+            sleep 3
+          done
 
       - name: Test with pytest  
         run: |  

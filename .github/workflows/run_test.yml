@@ -38,7 +38,8 @@ jobs:
       - name: Test with pytest  
         run: |  
           poetry run coverage run -m pytest  -v -s  
-
+        env:
+          LOG_PATH: log  
       - name: Generate Coverage Report  
         run: |  
           poetry run coverage report -m

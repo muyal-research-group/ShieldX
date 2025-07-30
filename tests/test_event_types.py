@@ -43,7 +43,7 @@ async def created_event_type(client):
 
 # ---------- TESTS ----------
 
-@pytest_asyncio.fixture
+@pytest.mark.asyncio
 async def test_create_event_type(client):
     """
     Verifica que se pueda crear correctamente un tipo de evento.

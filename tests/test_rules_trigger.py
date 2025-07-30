@@ -35,7 +35,7 @@ async def setup_rule_and_trigger(client):
     # Crear trigger
     trigger_resp = await client.post("/api/v1/triggers/", json={"name": "TriggerRulesTest"})
     assert trigger_resp.status_code == 201
-    trigger_id = trigger_resp.json()["_id"]
+    trigger_id = trigger_resp.json()["id"]
 
     # Crear regla válida
     rule_payload = {

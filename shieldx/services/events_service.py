@@ -117,7 +117,7 @@ class EventsService:
         if event:
             L.debug({
                 "event": "EVENT.FETCH.BY_ID",
-                "event_id": str(event.Event_id),
+                "event_id": str(event.event_id),
                 "time": T.time() - t1
             })
         else:

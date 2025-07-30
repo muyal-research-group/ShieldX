@@ -20,7 +20,7 @@ class EventModel(BaseModel):
     - timestamp: Fecha y hora en la que ocurrió el evento (UTC por defecto).
     - payload: Carga útil opcional con datos adicionales del evento.
     """
-    Event_id: Optional[str] = Field(default=None, alias="_id")
+    event_id: Optional[str] = Field(default=None, alias="_id")
     service_id: str
     microservice_id: str
     function_id: str
@@ -28,7 +28,7 @@ class EventModel(BaseModel):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     payload: Optional[Any] = None
 
-    @field_validator("Event_id", mode="before")
+    @field_validator("event_id", mode="before")
     def convert_object_id(cls, v):
         if isinstance(v, ObjectId):
             return str(v)

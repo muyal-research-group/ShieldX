@@ -2,11 +2,13 @@ name: Run Unit Test via Pytest
   
 on:
   push: 
-    branches:
-      - master
+    branches: ["*"]
   pull_request:
-    branches:
-      - master
+    branches: ["*"]
+    paths:
+      - "src/**"
+      - "test/**"
+      - "pyproject.toml"
   
   
 jobs:  

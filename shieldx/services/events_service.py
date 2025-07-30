@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from shieldx.models import EventModel
-from shieldx.repositories import EventsRepository
+from shieldx.repositories.events_repository import EventsRepository
+from bson import ObjectId
 from typing import List, Optional
 from shieldx.log.logger_config import get_logger
 import time as T
@@ -32,6 +33,7 @@ class EventsService:
 
         # Validar existencia del event_type por nombre
         event_type_doc = await self.event_type_repo.get_by_name(event.event_type)
+        
         if not event_type_doc:
             L.error({
             "event": "EVENT.CREATE.FAILED.EVENT_TYPE.NOT_FOUND",
@@ -41,15 +43,15 @@ class EventsService:
             raise HTTPException(status_code=404, detail=f"Event type '{event.event_type}' not found")
 
         # Crear el evento
-        created_event = await self.repository.create_event(event)
-
+        #created_event = await self.repository.create_event(event)
+        created_event = await self.repository.insert_one(event)
         if created_event:
             L.info({
                 "event": "EVENT.CREATED",
-                "event_id": created_event["_id"],
+                "event_id": created_event,
                 "time": T.time() - t1
             })
-            return {"event_id": str(created_event["_id"])}
+            return {"event_id": str(created_event)}
 
         L.error({
             "event": "EVENT.CREATE.FAILED",
@@ -62,7 +64,10 @@ class EventsService:
         Obtiene todos los eventos almacenados en la base de datos.
         """
         t1 = T.time()
-        events = await self.repository.find_all_events()
+
+        #events = await self.repository.find_all_events()
+        events = await self.repository.find_all()
+
         L.debug({
             "event": "EVENT.LIST.ALL",
             "count": len(events),
@@ -107,17 +112,18 @@ class EventsService:
         Obtiene un evento específico por `event_id`.
         """
         t1 = T.time()
-        event = await self.repository.find_event_by_id(event_id)
+        #event = await self.repository.find_event_by_id(event_id)
+        event = await self.repository.find_one(event_id)
         if event:
             L.debug({
                 "event": "EVENT.FETCH.BY_ID",
-                "event_id": event_id,
+                "event_id": event,
                 "time": T.time() - t1
             })
         else:
             L.warning({
                 "event": "EVENT.NOT_FOUND",
-                "event_id": event_id,
+                "event_id": event,
                 "time": T.time() - t1
             })
         return event
@@ -131,7 +137,8 @@ class EventsService:
         :return: Evento actualizado o None.
         """
         t1 = T.time()
-        updated_event = await self.repository.update_event(event_id, update_data)
+        #updated_event = await self.repository.update_event(event_id, update_data)
+        updated_event = await self.repository.update_one({"_id": ObjectId(event_id)}, update_data)
         if updated_event:
             L.info({
                 "event": "EVENT.UPDATED",
@@ -154,7 +161,8 @@ class EventsService:
         :return: True si se eliminó, False si no se encontró.
         """
         t1 = T.time()
-        result = await self.repository.delete_event(event_id)
+        #result = await self.repository.delete_event(event_id)
+        result = await self.repository.delete_one({"_id": ObjectId(event_id)})
         if result:
             L.info({
                 "event": "EVENT.DELETED",

@@ -1,1 +1,1 @@
-from shieldx.services.events import EventsService
+from shieldx.services.events_service import EventsService

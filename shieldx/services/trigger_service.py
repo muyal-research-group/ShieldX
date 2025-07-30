@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from shieldx.models.trigger_models import TriggerModel
 from shieldx.repositories import TriggersRepository
 from shieldx.log.logger_config import get_logger
+from bson import ObjectId
 import time as T
 
 L = get_logger(__name__)
@@ -21,27 +22,29 @@ class TriggerService:
         Crea un nuevo trigger si no existe uno con el mismo nombre y registra la operación.
         """
         t1 = T.time()
-        if await self.repository.get_trigger_by_name(trigger.name):
+        if await self.repository.find_one({"name": trigger.name}):
             L.warning({
                 "event": "TRIGGER.CREATE.CONFLICT",
                 "name": trigger.name,
                 "time": T.time() - t1
             })
             raise HTTPException(status_code=409, detail="Trigger already exists")
-        created_trigger = await self.repository.create_trigger(trigger)
+        created_trigger = await self.repository.insert_one(trigger)
+        created_doc = await self.repository.find_one({"_id": ObjectId(created_trigger)})
         L.info({
             "event": "TRIGGER.CREATED",
             "name": trigger.name,
             "time": T.time() - t1
         })
-        return created_trigger
+        return created_doc
+    
 
     async def get_all_triggers(self):
         """
         Devuelve la lista de todos los triggers almacenados y registra la operación.
         """
         t1 = T.time()
-        triggers = await self.repository.get_all_triggers()
+        triggers = await self.repository.find_all()
         L.debug({
             "event": "TRIGGER.LIST.ALL",
             "count": len(triggers),
@@ -54,7 +57,7 @@ class TriggerService:
         Obtiene un trigger específico por su nombre y registra la operación.
         """
         t1 = T.time()
-        trigger = await self.repository.get_trigger_by_name(name)
+        trigger = await self.repository.find_one({"name": name})
         if not trigger:
             L.warning({
                 "event": "TRIGGER.NOT_FOUND",
@@ -74,15 +77,17 @@ class TriggerService:
         Actualiza un trigger existente con nuevos datos y registra la operación.
         """
         t1 = T.time()
-        if not await self.repository.get_trigger_by_name(name):
+        if not await self.repository.find_one({"name": name}):
             L.warning({
                 "event": "TRIGGER.UPDATE.NOT_FOUND",
                 "name": name,
                 "time": T.time() - t1
             })
             raise HTTPException(status_code=404, detail="Trigger not found")
-        update_data = updated.model_dump(by_alias=True, exclude_unset=True)
-        updated_trigger = await self.repository.update_trigger(name, update_data)
+
+        updated_trigger = await self.repository.update_one({"name": name}, updated)
+        updated_trigger = await self.repository.find_one({"name": updated.name})
+
         L.info({
             "event": "TRIGGER.UPDATED",
             "name": name,
@@ -95,14 +100,14 @@ class TriggerService:
         Elimina un trigger por su nombre y registra la operación.
         """
         t1 = T.time()
-        if not await self.repository.get_trigger_by_name(name):
+        if not await self.repository.find_one({"name": name}):
             L.warning({
                 "event": "TRIGGER.DELETE.NOT_FOUND",
                 "name": name,
                 "time": T.time() - t1
             })
             raise HTTPException(status_code=404, detail="Trigger not found")
-        await self.repository.delete_trigger(name)
+        await self.repository.delete_one({"name": name})
         L.info({
             "event": "TRIGGER.DELETED",
             "name": name,

@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from shieldx.repositories.rules_repository import RuleRepository
 from shieldx.models.rule_models import RuleModel
 from shieldx.log.logger_config import get_logger
+from bson import ObjectId
 import time as T
 
 L = get_logger(__name__)
@@ -29,7 +30,8 @@ class RuleService:
         """
         t1 = T.time()
         try:
-            rule_id = await self.repository.create(rule.model_dump(by_alias=True, exclude_none=True))
+            #rule_id = await self.repository.create(rule.model_dump(by_alias=True, exclude_none=True))
+            rule_id = await self.repository.insert_one(rule)
             L.info({
                 "event": "RULE.CREATED",
                 "rule_id": rule_id,
@@ -48,7 +50,7 @@ class RuleService:
         """
         t1 = T.time()
         try:
-            rules = await self.repository.get_all()
+            rules = await self.repository.find_all()
             L.debug({
                 "event": "RULE.LIST",
                 "count": len(rules),
@@ -67,7 +69,7 @@ class RuleService:
         :return: Objeto RuleModel si existe, de lo contrario lanza HTTPException 404.
         """
         t1 = T.time()
-        rule = await self.repository.get_by_id(rule_id)
+        rule = await self.repository.find_one({"_id": ObjectId(rule_id)})
         if not rule:
             L.warning({
                 "event": "RULE.NOT_FOUND",
@@ -91,7 +93,7 @@ class RuleService:
         """
         t1 = T.time()
         try:
-            await self.repository.update(rule_id, rule.model_dump(by_alias=True, exclude_none=True))
+            await self.repository.update_one({"_id": ObjectId(rule_id)}, rule)
             L.info({
                 "event": "RULE.UPDATED",
                 "rule_id": rule_id,
@@ -108,7 +110,7 @@ class RuleService:
         :param rule_id: ID de la regla a eliminar.
         """
         t1 = T.time()
-        rule = await self.repository.get_by_id(rule_id)
+        rule = await self.repository.find_one({"_id": ObjectId(rule_id)})
         if not rule:
             L.warning({
                 "event": "RULE.DELETE.NOT_FOUND",
@@ -116,7 +118,7 @@ class RuleService:
                 "time": T.time() - t1
             })
             raise HTTPException(status_code=404, detail="Rule not found")
-        await self.repository.delete(rule_id)
+        await self.repository.delete_one({"_id": ObjectId(rule_id)})
         L.info({
             "event": "RULE.DELETED",
             "rule_id": rule_id,

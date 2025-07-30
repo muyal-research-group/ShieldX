@@ -28,9 +28,12 @@ async def client():
 # ---------- DATOS DE PRUEBA ----------
 
 trigger_payload = {
-    "name": "TriggerTestNuevo"
+    "name": "TriggerTestNuevo1"
 }
 
+trigger_payloadcreate = {
+    "name": "TriggerTestNuevo2"
+}
 @pytest_asyncio.fixture
 async def existing_trigger(client):
     """
@@ -45,10 +48,12 @@ async def test_create_trigger(client):
     """
     ✅ Verifica que se pueda crear un trigger correctamente.
     """
-    response = await client.post("/api/v1/triggers/", json=trigger_payload)
+    
+
+    response = await client.post("/api/v1/triggers/", json=trigger_payloadcreate)
     assert response.status_code == 201
     data = response.json()
-    assert data["name"] == trigger_payload["name"]
+    assert data["name"] == trigger_payloadcreate["name"]
     assert "_id" in data
 
 @pytest.mark.asyncio

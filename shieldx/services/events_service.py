@@ -123,7 +123,7 @@ class EventsService:
         else:
             L.warning({
                 "event": "EVENT.NOT_FOUND",
-                "event_id": str(event.Event_id),
+                "event_id": str(event.event_id),
                 "time": T.time() - t1
             })
         return event

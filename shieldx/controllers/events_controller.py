@@ -104,7 +104,7 @@ async def get_event_by_id(event_id: str, events_service: EventsService = Depends
     if not event:
         L.warning({
             "event": "API.EVENT.NOT_FOUND",
-            "event_id": str(event.Event_id),
+            "event_id": str(event.event_id),
             "time": T.time() - t1
         })
         raise HTTPException(status_code=404, detail="Evento no encontrado")

@@ -1,5 +1,4 @@
-from shieldx.repositories.events_triggers_repository import EventsTriggersRepository
-from shieldx.models.events_triggers import EventsTriggersModel
+from shieldx.repositories import EventsTriggersRepository
 from shieldx.log.logger_config import get_logger
 import time as T
 

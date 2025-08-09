@@ -1,10 +1,8 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from bson import ObjectId
-from shieldx.models.event_types import EventTypeModel
+from shieldx.models import EventTypeModel
 from shieldx.log.logger_config import get_logger
 import time as T
-from shieldx.repositories.base_repository import BaseRepository
-from pymongo.errors import PyMongoError
+from shieldx.repositories import BaseRepository
 
 L = get_logger(__name__)
 

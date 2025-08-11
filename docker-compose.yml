@@ -1,6 +1,7 @@
 services:
   shieldx-db:
     image: mongo:latest
+    container_name: shieldx-db
     ports:
       - "27017:27017"
     volumes:
@@ -9,9 +10,22 @@ services:
 
   shieldx-broker:
     image: rabbitmq:4.0-management
+    container_name: shieldx-broker
     ports:
       - "5672:5672"
       - "15672:15672"
+    restart: unless-stopped
+
+  shieldx-api:
+    image: edgar821/shieldx-api:latest
+    container_name: shieldx-api
+    depends_on:
+      - shieldx-db
+      - shieldx-broker
+    ports:
+      - "20000:20000"
+    volumes:
+      - ./logs:/app/log
     restart: unless-stopped
 
 volumes:

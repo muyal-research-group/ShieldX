@@ -9,28 +9,6 @@
 </div>
 
 ShieldX is a secure management platform for microservices. It provides an integrated dashboard and toolset to manage, monitor, and secure your microservices environment. With robust encryption, secure communication channels, and scalable orchestration, ShieldX is designed to safeguard your infrastructure while ensuring efficient operations.
-## ⚠️ Clone the repo and setup a remoto 🍴: 
-
-1. You must clone the remote from the organization of Muyal: 
-```bash
-git clone git@github.com:muyal-research-group/ShieldX.git
-```
-
-2. You must create a fork (please check it up in the [Contribution](#contribution) section)
-
-3. Add a new remote in your local git: 
-   ```bash
-   git remote add <remote_name> <ssh> 
-   ```
-You must select ```<remote_name>``` and you must copy the ```<ssh>``` uri in the github page of your 
-
-<div align="center">
-<img width=350 src="images/gitclone_ssh.png"/>
-</div>
-
-4. Remember to push all your commits to your ```<remote_name>``` to avoid github conflicts. 
-
-Thats it!  let's get started 🚀
 
 ## Getting started
 
@@ -169,11 +147,15 @@ docker compose down -v
 
 ### 7️⃣ Environment variables
 
-`docker-compose.yml` can load variables from a `.env` file (not committed to the repository) for settings like:
+`docker-compose.yml` can load variables from a `.env` file not committed to the repository for security reason, but an example is shown here:
 
 ```env
+API_PORT=20000
 MONGO_URI=mongodb://shieldx-db:27017
+RABBITMQ_PORT=5672
+RABBIT_MAQ_MANAGEMENT_PORT=15672
 LOG_LEVEL=info
+API_IMAGE=edgar821/shieldx-api:latest
 ```
 
 You can document them here or in a `.env.example` without sensitive data.
@@ -248,3 +230,26 @@ Please follow these steps to help improve the project:
 
 7. **Review Process:**
    - Your pull request will be reviewed by the maintainers. Feedback and further changes may be requested.
+
+## ⚠️ Clone the repo and setup a remote 🍴: 
+
+1. You must clone the remote from the organization of Muyal: 
+```bash
+git clone git@github.com:muyal-research-group/ShieldX.git
+```
+
+2. You must create a fork (please check it up in the [Contribution](#contribution) section)
+
+3. Add a new remote in your local git: 
+   ```bash
+   git remote add <remote_name> <ssh> 
+   ```
+You must select ```<remote_name>``` and you must copy the ```<ssh>``` uri in the github page of your 
+
+<div align="center">
+<img width=350 src="images/gitclone_ssh.png"/>
+</div>
+
+4. Remember to push all your commits to your ```<remote_name>``` to avoid github conflicts. 
+
+Thats it!  let's get started 🚀

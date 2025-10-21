@@ -3,30 +3,48 @@ services:
     image: mongo:latest
     container_name: shieldx-db
     ports:
-      - "${MONGO_PORT:-27018}:27017"
+      - "${SHIELDX_MONGO_PORT:-27018}:27017"
     volumes:
       - mongo-data:/data/db
     restart: unless-stopped
+    networks:
+      - shieldx-net
 
-  shieldx-broker:
-    image: rabbitmq:4.0-management
-    container_name: shieldx-broker
-    ports:
-      - "${RABBITMQ_PORT:-5672}:5672"
-      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
-    restart: unless-stopped
 
   shieldx-api:
-    image: ${API_IMAGE:-edgar821/shieldx-api:latest}
+    # image: ${API_IMAGE:-edgar821/shieldx-api:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: shieldx-api
+    image: ${SHIELDX_API_IMAGE:-shieldx:api}
     depends_on:
       - shieldx-db
-      - shieldx-broker
+    env_file:
+      - .env.dev
     ports:
-      - "${API_PORT}:20000"
-    volumes:
-      - /log:/app/log
+      - "${SHIELDX_PORT:-20000}:20000"
+    # If you want to persist logs, uncomment the following lines and create a /log folder in the host
+    # You also need to set ownership/permissions to log folder  in the host machine
+    # sudo chown 101:101 /log
+    # volumes:
+      # - /log:/app/log:rw
     restart: unless-stopped
+    # For testing purposes, you can run a sleep command to keep the container running
+    # command: ["sleep", "infinity"]
+    command: ["uvicorn", "shieldx.server:app", "--host", "0.0.0.0", "--port", "${SHIELDX_PORT:-20000}"]
+    networks:
+      - shieldx-net
 
+  # shieldx-broker:
+  #   image: rabbitmq:4.0-management
+  #   container_name: shieldx-broker
+  #   ports:
+  #     - "${SHIELDX_RABBITMQ_PORT:-5672}:5672"
+  #     - "${SHIELDX_RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+  #   restart: unless-stopped
 volumes:
   mongo-data:
+networks:
+  shieldx-net:
+    external: true
